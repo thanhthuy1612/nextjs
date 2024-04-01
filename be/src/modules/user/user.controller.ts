@@ -1,7 +1,16 @@
-import { Controller, Get, Put, Delete, Param, Body } from '@nestjs/common';
-import { UserService } from '../service/user.service';
+import {
+  Controller,
+  Get,
+  Put,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
+import { UserService } from './user.service';
 import { ResponseData } from 'src/global/globalClass';
-import { User } from 'src/user/models/UserScheme';
+import { User } from 'src/models/UserScheme';
+import { AuthGuard } from 'src/modules/auth/auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -11,6 +20,7 @@ export class UserController {
     return this.userService.findAll();
   }
 
+  @UseGuards(AuthGuard)
   @Get(':id')
   async getUser(
     @Param('id')

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from 'src/user/models/UserScheme';
+import { User } from 'src/models/UserScheme';
 import mongoose from 'mongoose';
 import { ResponseData } from 'src/global/globalClass';
 import { HttpMessage, HttpStatus } from 'src/global/globalEnum';
@@ -21,6 +21,7 @@ export class UserService {
         HttpMessage.SUCCESS,
       );
     } catch (error) {
+      console.log(error);
       return new ResponseData<User>(null, HttpStatus.ERROR, HttpMessage.ERROR);
     }
   }
@@ -47,6 +48,7 @@ export class UserService {
         HttpMessage.SUCCESS,
       );
     } catch (error) {
+      console.log(error);
       return new ResponseData<User>(null, HttpStatus.ERROR, HttpMessage.ERROR);
     }
   }
@@ -81,6 +83,7 @@ export class UserService {
         HttpMessage.SUCCESS,
       );
     } catch (error) {
+      console.log(error);
       return new ResponseData<User>(null, HttpStatus.ERROR, HttpMessage.ERROR);
     }
   }
@@ -94,9 +97,11 @@ export class UserService {
         HttpMessage.SUCCESS,
       );
     } catch (error) {
+      console.log(error);
       return new ResponseData<User>(null, HttpStatus.ERROR, HttpMessage.ERROR);
     }
   }
+
   async update(id: string, user: User): Promise<ResponseData<User>> {
     try {
       const users = await this.userModel.findByIdAndUpdate(id, user);
@@ -106,6 +111,7 @@ export class UserService {
         HttpMessage.SUCCESS,
       );
     } catch (error) {
+      console.log(error);
       return new ResponseData<User>(null, HttpStatus.ERROR, HttpMessage.ERROR);
     }
   }
@@ -118,6 +124,7 @@ export class UserService {
         HttpMessage.SUCCESS,
       );
     } catch (error) {
+      console.log(error);
       return new ResponseData<User>(null, HttpStatus.ERROR, HttpMessage.ERROR);
     }
   }
