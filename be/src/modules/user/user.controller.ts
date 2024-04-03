@@ -10,23 +10,32 @@ import {
 import { UserService } from './user.service';
 import { ResponseData } from 'src/global/globalClass';
 import { User } from 'src/models/UserScheme';
-import { AuthGuard } from 'src/modules/auth/auth.guard';
+import { HttpMessage, HttpStatus } from 'src/global/globalEnum';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
   @Get()
   async getAllUser(): Promise<ResponseData<User>> {
-    return this.userService.findAll();
+    return new ResponseData<User>(
+      await this.userService.findAll(),
+      HttpStatus.SUCCESS,
+      HttpMessage.SUCCESS,
+    );
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   async getUser(
     @Param('id')
     id: string,
   ): Promise<ResponseData<User>> {
-    return this.userService.findById(id);
+    return new ResponseData<User>(
+      await this.userService.findById(id),
+      HttpStatus.SUCCESS,
+      HttpMessage.SUCCESS,
+    );
   }
 
   @Put(':id')
@@ -36,7 +45,11 @@ export class UserController {
     @Body()
     user: User,
   ): Promise<ResponseData<User>> {
-    return this.userService.update(id, user);
+    return new ResponseData<User>(
+      await this.userService.update(id, user),
+      HttpStatus.SUCCESS,
+      HttpMessage.SUCCESS,
+    );
   }
 
   @Delete(':id')
@@ -44,6 +57,10 @@ export class UserController {
     @Param('id')
     id: string,
   ): Promise<ResponseData<User>> {
-    return this.userService.delete(id);
+    return new ResponseData<User>(
+      await this.userService.delete(id),
+      HttpStatus.SUCCESS,
+      HttpMessage.SUCCESS,
+    );
   }
 }

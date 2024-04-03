@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { ResponseData } from 'src/global/globalClass';
 import { User } from 'src/models/UserScheme';
 import { AuthGuard } from './auth.guard';
+import { HttpMessage, HttpStatus } from 'src/global/globalEnum';
 
 @Controller('auth')
 export class AuthController {
@@ -13,7 +14,11 @@ export class AuthController {
     @Body()
     user: User,
   ): Promise<ResponseData<any>> {
-    return this.authService.register(user);
+    return new ResponseData<User>(
+      await this.authService.register(user),
+      HttpStatus.SUCCESS,
+      HttpMessage.SUCCESS,
+    );
   }
 
   @Post('login')
@@ -21,12 +26,20 @@ export class AuthController {
     @Body()
     user: User,
   ): Promise<ResponseData<any>> {
-    return this.authService.login(user);
+    return new ResponseData<User>(
+      await this.authService.login(user),
+      HttpStatus.SUCCESS,
+      HttpMessage.SUCCESS,
+    );
   }
 
   @Post('refresh')
-  async refresh(@Body() body): Promise<ResponseData<any>> {
-    return await this.authService.refresh(body.refresh);
+  async refresh(@Body() body: { refresh: string }): Promise<ResponseData<any>> {
+    return new ResponseData<User>(
+      await this.authService.refresh(body.refresh),
+      HttpStatus.SUCCESS,
+      HttpMessage.SUCCESS,
+    );
   }
 
   @UseGuards(AuthGuard)
@@ -35,6 +48,10 @@ export class AuthController {
     @Body()
     user: User,
   ): Promise<ResponseData<any>> {
-    return await this.authService.logout(user);
+    return new ResponseData<User>(
+      await this.authService.logout(user),
+      HttpStatus.SUCCESS,
+      HttpMessage.SUCCESS,
+    );
   }
 }

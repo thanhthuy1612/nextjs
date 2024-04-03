@@ -4,19 +4,27 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthService } from '../auth.service';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtTwoFactorStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-two-factor',
+) {
   constructor(private readonly authService: AuthService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: process.env.SECRETKEY,
+      ignoreExpiration: true,
     });
   }
 
-  async validate({ username }) {
-    const user = await this.authService.validateUser(username);
+  async validate({ email, isSecondFactorAuthenticated }) {
+    const user = await this.authService.validateUser(email);
 
     if (!user) {
       throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
+    }
+
+    if (user.isTwoFactorAuthenticationEnabled && !isSecondFactorAuthenticated) {
+      throw new HttpException('Permission denied', HttpStatus.FORBIDDEN);
     }
 
     return user;

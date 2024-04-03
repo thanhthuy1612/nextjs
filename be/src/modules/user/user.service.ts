@@ -1,9 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/models/UserScheme';
 import mongoose from 'mongoose';
-import { ResponseData } from 'src/global/globalClass';
-import { HttpMessage, HttpStatus } from 'src/global/globalEnum';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -12,120 +10,113 @@ export class UserService {
     @InjectModel(User.name)
     private userModel: mongoose.Model<User>,
   ) {}
-  async findAll(): Promise<ResponseData<User>> {
+  async findAll(): Promise<User[]> {
     try {
-      const accounts = await this.userModel.find();
-      return new ResponseData<User>(
-        accounts,
-        HttpStatus.SUCCESS,
-        HttpMessage.SUCCESS,
-      );
+      const users = await this.userModel.find();
+      return users;
     } catch (error) {
       console.log(error);
-      return new ResponseData<User>(null, HttpStatus.ERROR, HttpMessage.ERROR);
+      throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
     }
   }
-  async create(user: User): Promise<ResponseData<User | string>> {
+  async create(user: User): Promise<User> {
     try {
       user.password = await bcrypt.hash(user.password, 10);
 
       const userInDb = await this.userModel.find({
-        email: user.email,
+        username: user.username,
       });
 
       if (userInDb.length > 0) {
-        return new ResponseData<string>(
-          'User already exists',
-          HttpStatus.SUCCESS,
-          HttpMessage.SUCCESS,
-        );
+        throw new HttpException('User already exists', HttpStatus.UNAUTHORIZED);
       }
 
-      const users = await this.userModel.create(user);
-      return new ResponseData<User>(
-        users,
-        HttpStatus.SUCCESS,
-        HttpMessage.SUCCESS,
-      );
+      const newUser = await this.userModel.create(user);
+      return newUser;
     } catch (error) {
       console.log(error);
-      return new ResponseData<User>(null, HttpStatus.ERROR, HttpMessage.ERROR);
+      throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
     }
   }
 
-  async findByLogin(user: User): Promise<ResponseData<User | string>> {
+  async findLogin(user: User): Promise<User> {
     try {
       const findUser = await this.userModel.find({
-        email: user.email,
+        username: user.username,
       });
 
       if (!findUser) {
-        return new ResponseData<string>(
-          'User not found',
-          HttpStatus.SUCCESS,
-          HttpMessage.SUCCESS,
-        );
+        throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
       }
 
       const is_equal = bcrypt.compareSync(user.password, findUser[0].password);
 
       if (!is_equal) {
-        return new ResponseData<string>(
-          'Invalid credentials',
-          HttpStatus.SUCCESS,
-          HttpMessage.SUCCESS,
-        );
+        throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
       }
 
-      return new ResponseData<User>(
-        findUser,
-        HttpStatus.SUCCESS,
-        HttpMessage.SUCCESS,
-      );
+      return findUser[0];
     } catch (error) {
       console.log(error);
-      return new ResponseData<User>(null, HttpStatus.ERROR, HttpMessage.ERROR);
+      throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
     }
   }
 
-  async findById(id: string): Promise<ResponseData<User>> {
+  async findByUserName(username: string): Promise<User> {
     try {
-      const users = await this.userModel.findById(id);
-      return new ResponseData<User>(
-        users,
-        HttpStatus.SUCCESS,
-        HttpMessage.SUCCESS,
-      );
+      const findUser = await this.userModel.find({ username });
+      if (!findUser) {
+        throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
+      }
+      return findUser[0];
     } catch (error) {
       console.log(error);
-      return new ResponseData<User>(null, HttpStatus.ERROR, HttpMessage.ERROR);
+      throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
     }
   }
 
-  async update(id: string, user: User): Promise<ResponseData<User>> {
+  async findAndUpdateByUserName(username: string): Promise<User> {
     try {
-      const users = await this.userModel.findByIdAndUpdate(id, user);
-      return new ResponseData<User>(
-        users,
-        HttpStatus.SUCCESS,
-        HttpMessage.SUCCESS,
+      const findUser = await this.userModel.findOneAndUpdate(
+        { username },
+        {
+          refreshToken: null,
+        },
       );
+      return findUser;
     } catch (error) {
       console.log(error);
-      return new ResponseData<User>(null, HttpStatus.ERROR, HttpMessage.ERROR);
+      throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
     }
   }
-  async delete(id: string): Promise<ResponseData<User>> {
+
+  async findById(id: string): Promise<User> {
     try {
-      const users = await this.userModel.findByIdAndDelete(id);
-      return new ResponseData<User>(
-        users,
-        HttpStatus.SUCCESS,
-        HttpMessage.SUCCESS,
-      );
+      const user = await this.userModel.findById(id);
+      return user;
     } catch (error) {
       console.log(error);
-      return new ResponseData<User>(null, HttpStatus.ERROR, HttpMessage.ERROR);
+      throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
+    }
+  }
+
+  async update(id: string, user): Promise<User> {
+    try {
+      const newUser = await this.userModel.findByIdAndUpdate(id, user);
+      return newUser;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
+    }
+  }
+
+  async delete(id: string): Promise<User> {
+    try {
+      const user = await this.userModel.findByIdAndDelete(id);
+      return user;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
     }
   }
 }
