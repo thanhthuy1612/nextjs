@@ -1,9 +1,10 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ResponseData } from 'src/global/globalClass';
 import { User } from 'src/models/UserScheme';
-import { AuthGuard } from './auth.guard';
+import { AuthGuardCustom } from './auth.guard';
 import { HttpMessage, HttpStatus } from 'src/global/globalEnum';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -42,7 +43,7 @@ export class AuthController {
     );
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuardCustom)
   @Post('logout')
   async logout(
     @Body()
@@ -50,6 +51,16 @@ export class AuthController {
   ): Promise<ResponseData<any>> {
     return new ResponseData<User>(
       await this.authService.logout(user),
+      HttpStatus.SUCCESS,
+      HttpMessage.SUCCESS,
+    );
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req): Promise<ResponseData<any>> {
+    return new ResponseData<any>(
+      await this.authService.googleLogin(req),
       HttpStatus.SUCCESS,
       HttpMessage.SUCCESS,
     );

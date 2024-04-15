@@ -1,20 +1,20 @@
 import axios from 'axios';
-import {  baseURL } from './url';
+import { baseURL } from './url';
 
-const request = axios.create({ baseURL: baseURL });
+const request = axios.create({ baseURL: baseURL, withCredentials: true });
 
-// request.interceptors.request.use(
-//     function (config) {
-//         const accessToken = localStorage.getItem('token');
-//         if (accessToken) {
-//             config.headers['x-access-token'] = accessToken;
-//         }
-//         return config;
-//     },
-//     function (error) {
-//         return Promise.reject(error);
-//     },
-// );
+request.interceptors.request.use(
+  function (config) {
+    const accessToken = localStorage.getItem('token');
+    if (accessToken) {
+      config.headers['x-access-token'] = accessToken;
+    }
+    return config;
+  },
+  function (error) {
+    return Promise.reject(error);
+  },
+);
 
 export const get = async (path: string, options = {}) => {
   const response = await request.get(path, options);

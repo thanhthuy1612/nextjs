@@ -14,7 +14,7 @@ export class AuthService {
     try {
       const users = await this.userService.create(user);
       const token = await this._createToken(users);
-      return { username: users.username, token };
+      return { username: users.username, ...token };
     } catch (error) {
       console.log(error);
       throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
@@ -27,7 +27,7 @@ export class AuthService {
 
       const token = await this._createToken(findUser);
 
-      return { username: findUser.username, token };
+      return { username: findUser.username, ...token };
     } catch (error) {
       console.log(error);
       throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
@@ -39,10 +39,16 @@ export class AuthService {
     isSecondFactorAuthenticated = false,
     refresh = true,
   ) {
-    const accessToken = await this.jwtService.signAsync({
-      username: user.username,
-      isSecondFactorAuthenticated,
-    });
+    const accessToken = await this.jwtService.signAsync(
+      {
+        username: user.username,
+        isSecondFactorAuthenticated,
+      },
+      {
+        secret: process.env.SECRETKEY,
+        expiresIn: process.env.EXPIRESIN,
+      },
+    );
 
     if (refresh) {
       const refreshToken = await this.jwtService.signAsync(
@@ -57,7 +63,6 @@ export class AuthService {
         expiresIn: process.env.EXPIRESIN,
         accessToken,
         refreshToken,
-        expiresInRefresh: process.env.EXPIRESIN_REFRESH,
       };
     } else {
       return {
@@ -101,5 +106,16 @@ export class AuthService {
       console.log(error);
       throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
     }
+  }
+
+  async googleLogin(req): Promise<any> {
+    if (!req.user) {
+      return 'No user from google';
+    }
+
+    return {
+      message: 'User information from google',
+      user: req.user,
+    };
   }
 }

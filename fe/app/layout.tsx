@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
 import { ConfigProvider } from "antd";
-
-const inter = Inter({ subsets: ["latin"] });
+import "./globals.css";
+import StoreProvider from "./StoreProvider";
 
 export const metadata: Metadata = {
   title: "Project",
@@ -17,8 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        {/* <header>1</header> */}
+      <StoreProvider>
         <ConfigProvider
           theme={{
             token: {
@@ -29,15 +26,16 @@ export default function RootLayout({
               colorBgTextHover: '#6FB3B8',
               colorTextBase: '#388087',
               colorError: '#FF6961',
-
+              colorTextPlaceholder: '#E5E1DA',
 
               // Alias Token
               colorBgContainer: '#FBF9F1',
             },
           }}
-        >{children}</ConfigProvider>
-        {/* <footer>2</footer> */}
-      </body>
+        >
+          <body className="bg-primaryWhite">{children}</body>
+        </ConfigProvider>
+      </StoreProvider>
     </html>
   );
 }

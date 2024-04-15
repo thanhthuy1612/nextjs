@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
 import { UserService } from '../user/user.service';
 import { JwtStrategy } from './passport/jwt.strategy';
+import { GoogleStrategy } from './passport/google.strategy';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { JwtStrategy } from './passport/jwt.strategy';
       signOptions: { expiresIn: `${process.env.EXPIRESIN}s` },
     }),
   ],
-  providers: [AuthService, UserService, JwtStrategy],
+  providers: [AuthService, UserService, JwtStrategy, GoogleStrategy],
   controllers: [AuthController],
   exports: [AuthService, UserService],
 })

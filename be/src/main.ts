@@ -24,6 +24,14 @@ async function bootstrap() {
     module.hot.dispose(() => app.close());
   }
 
+  app.enableCors({
+    origin: ['http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'HEAD', 'DELETE'],
+    // preflightContinue: false,
+    // optionsSuccessStatus: 204,
+    credentials: true,
+  });
+
   await app.listen(8000);
 }
 bootstrap();

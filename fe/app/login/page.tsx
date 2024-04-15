@@ -1,18 +1,44 @@
 'use client'
-import React from 'react';
-import FormLogin from "./components/FormLogin";
-import type { MenuProps } from 'antd';
-import { Menu } from 'antd';
-import { UnlockOutlined, UserAddOutlined } from '@ant-design/icons';
-import FormRegister from './components/FormRegister';
 
-enum AuthMenu {
+import React from 'react';
+import type { MenuProps } from 'antd';
+import { UnlockOutlined, UserAddOutlined } from '@ant-design/icons';
+import dynamic from 'next/dynamic';
+import Loading from './loading';
+
+const FormLogin = dynamic(() => import('./components/FormLogin'), {
+  loading: () => <Loading />,
+  ssr: false,
+});
+
+
+const FormRegister = dynamic(() => import('./components/FormRegister'), {
+  loading: () => <Loading />,
+  ssr: false,
+});
+
+const Menu = dynamic(() => import('antd').then((antd) => antd.Menu), {
+  loading: () => <Loading />,
+  ssr: false,
+});
+
+const HeaderLogin = dynamic(() => import('./components/HeaderLogin'), {
+  loading: () => <Loading />,
+  ssr: false,
+});
+
+const FooterLogin = dynamic(() => import('./components/FooterLogin'), {
+  loading: () => <Loading />,
+  ssr: false,
+});
+
+export enum AuthMenu {
   LOGIN = 0,
   REGISTER = 1
 }
 
 export default function Login() {
-  const [current, setCurrent] = React.useState<AuthMenu>(AuthMenu.LOGIN);
+  const [auth, setAuth] = React.useState<AuthMenu>(AuthMenu.LOGIN);
 
   const items: MenuProps['items'] = [
     {
@@ -36,11 +62,11 @@ export default function Login() {
   ];
 
   const onClick: MenuProps['onClick'] = (e) => {
-    setCurrent(Number(e.key));
+    setAuth(Number(e.key));
   };
 
   const renderBody = () => {
-    switch (current) {
+    switch (auth) {
       case AuthMenu.LOGIN:
         return <FormLogin />
       case AuthMenu.REGISTER:
@@ -50,10 +76,12 @@ export default function Login() {
 
   return (
     <main className="flex min-h-screen w-[100%] items-center justify-center bg-cover bg-center bg-primaryBlueLight from-transparent to-black">
-      <div className="min-w-[600px] justify-center bg-primaryGrayLight rounded-xl">
-        <Menu onClick={onClick} style={{ display: 'flex', backgroundColor: 'transparent', borderTopLeftRadius: '0.75rem', borderTopRightRadius: '0.75rem' }} selectedKeys={[current.toString()]} mode="horizontal" items={items} />
+      <div className="min-w-[600px] justify-center bg-primaryGrayLight rounded-xl shadow-2xl">
+        <Menu onClick={onClick} style={{ display: 'flex', backgroundColor: 'transparent', borderTopLeftRadius: '0.75rem', borderTopRightRadius: '0.75rem' }} selectedKeys={[auth.toString()]} mode="horizontal" items={items} />
         <div className='flex flex-col my-[50px] mx-[100px] items-center justify-center text-primaryBlueDark'>
+          <HeaderLogin title={auth === AuthMenu.LOGIN ? 'Login' : 'Register'} Component={auth === AuthMenu.LOGIN ? UnlockOutlined : UserAddOutlined} />
           {renderBody()}
+          <FooterLogin />
         </div>
       </div>
     </main>

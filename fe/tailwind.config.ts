@@ -21,6 +21,10 @@ const config: Config = {
         primaryWhite: '#FBF9F1',
         primaryGray: '#E5E1DA',
         primaryGrayLight: '#F6F6F2',
+        primaryYellow: '#F4F2DE',
+        blueDarkPastel: '#1261A6',
+        redPastel: '#FF6961',
+        pinkPastel: '#D49E8D',
       },
       boxShadow: {
         'focus-visible': 'none',
