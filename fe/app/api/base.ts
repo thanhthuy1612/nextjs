@@ -9,6 +9,8 @@ request.interceptors.request.use(
     if (accessToken) {
       config.headers['x-access-token'] = accessToken;
     }
+    config.headers['Access-Control-Allow-Origin'] = '*';
+    config.headers['Access-Control-Allow-Headers'] = 'X-Requested-With';
     return config;
   },
   function (error) {
@@ -17,8 +19,12 @@ request.interceptors.request.use(
 );
 
 export const get = async (path: string, options = {}) => {
-  const response = await request.get(path, options);
-  return response.data;
+  try {
+    const response = await request.get(path, options);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export const update = async (path: string, options = {}) => {

@@ -20,6 +20,7 @@ const config: Config = {
         primaryGreen: '#C2EDCE',
         primaryWhite: '#FBF9F1',
         primaryGray: '#E5E1DA',
+        primaryBlack: '#606d73',
         primaryGrayLight: '#F6F6F2',
         primaryYellow: '#F4F2DE',
         blueDarkPastel: '#1261A6',

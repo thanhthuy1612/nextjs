@@ -15,7 +15,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       callbackURL: 'http://localhost:8000/auth/google',
       scope: ['email', 'profile'],
       origin: ['http://localhost:3000'],
-      referer: ['http://localhost:3000/'],
       credentials: true,
     });
   }
@@ -27,7 +26,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     done: VerifyCallback,
   ): Promise<any> {
     try {
-      console.log('google');
       const { name, emails, photos } = profile;
       const user = {
         email: emails[0].value,

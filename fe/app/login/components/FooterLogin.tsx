@@ -2,23 +2,33 @@
 
 import React from 'react';
 import { Button, List } from "antd"
-import { GoogleOutlined, FacebookOutlined } from '@ant-design/icons';
-import { google } from '@/app/api/auth';
+import { GoogleOutlined, FacebookOutlined, GithubOutlined } from '@ant-design/icons';
+import { signIn } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
 
 
 const FooterLogin: React.FC = () => {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const data = [
     {
       title: 'Continue with Google',
       icon: GoogleOutlined,
       className: 'w-[100%] bg-redPastel hover:!bg-redPastel active:!bg-redPastel',
-      onclick: google
+      onclick: () => signIn("google", { callbackUrl })
     },
     {
-      title: 'Continue with Facebook',
-      icon: FacebookOutlined,
-      className: 'w-[100%] bg-blueDarkPastel hover:!bg-blueDarkPastel active:!bg-blueDarkPastel'
-    }
+      title: 'Continue with Github',
+      icon: GithubOutlined,
+      className: 'w-[100%] bg-primaryBlack hover:!bg-primaryBlack active:!bg-primaryBlack',
+      onclick: () => signIn("github", { callbackUrl })
+    },
+    // {
+    //   title: 'Continue with Facebook',
+    //   icon: FacebookOutlined,
+    //   className: 'w-[100%] bg-blueDarkPastel hover:!bg-blueDarkPastel active:!bg-blueDarkPastel',
+    //   onclick: () => signIn("facebook", { callbackUrl })
+    // }
   ]
   return (
     <div className='w-[100%] mt-[10px]'>

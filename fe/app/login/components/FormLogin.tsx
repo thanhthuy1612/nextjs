@@ -3,7 +3,7 @@
 import React from 'react';
 import { Button, Checkbox, Form, type FormProps, Input } from 'antd';
 import { KeyOutlined, UserOutlined } from '@ant-design/icons';
-import { login } from '@/app/api/auth';
+import { login } from '@/app/api/auth/auth';
 import { useAppDispatch } from '@/lib/hooks';
 import { updateUsername } from '@/lib/features/userSlice';
 
