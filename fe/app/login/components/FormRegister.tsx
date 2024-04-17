@@ -1,7 +1,12 @@
 'use client'
 import React from 'react';
-import { Button, Form, type FormProps, Input } from 'antd';
+import { Button, Form, type FormProps, Input, NotificationArgsProps } from 'antd';
 import { KeyOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
+import { useAppDispatch } from '@/lib/hooks';
+import { updateUsername } from '@/lib/features/userSlice';
+import { register } from '@/app/api/auth/auth';
+import { useRouter } from 'next/navigation'
+import { updateNotification } from '@/lib/features/notification';
 
 type FieldType = {
   username?: string;
@@ -10,22 +15,35 @@ type FieldType = {
   rePassword?: string;
 };
 
-
 const FormRegister: React.FC = () => {
-  const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-    console.log('Success:', values);
+  const router = useRouter()
+  const dispatch = useAppDispatch();
+
+  const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
+    if (values.username && values.password && values.email) {
+      const fetchRegister = await register({ username: values.username, password: values.password, email: values.email })
+      if (fetchRegister.data?.username) {
+        dispatch(updateUsername(fetchRegister?.username))
+        router.push('/')
+        dispatch(updateNotification({
+          type: 'success',
+          description: 'Register in successfully'
+        }))
+      } else {
+        dispatch(updateNotification({
+          type: 'fail',
+          description: fetchRegister.data
+        }))
+      }
+    }
   };
 
-  const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
   return (
     <Form
       name="register"
       style={{ width: "100%" }}
       initialValues={{ remember: true }}
       onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
       autoComplete="off"
     >
       <Form.Item<FieldType>
@@ -37,7 +55,13 @@ const FormRegister: React.FC = () => {
 
       <Form.Item<FieldType>
         name="email"
-        rules={[{ required: true, message: 'Please input your email!' }]}
+        rules={[
+          {
+            type: 'email',
+            message: 'The input is not valid E-mail!',
+          },
+          { required: true, message: 'Please input your email!' }
+        ]}
       >
         <Input placeholder="Email" style={{ borderRadius: '50px' }} size="large" prefix={<MailOutlined className='text-primaryBlueDark' style={{ marginLeft: '5px', marginRight: '5px' }} />} />
       </Form.Item>
@@ -51,7 +75,19 @@ const FormRegister: React.FC = () => {
 
       <Form.Item<FieldType>
         name="rePassword"
-        rules={[{ required: true, message: 'Please input your password!' }]}
+        rules={[
+          {
+            required: true, message: 'Please input your re-password!'
+          },
+          ({ getFieldValue }) => ({
+            validator(_, value) {
+              if (!value || getFieldValue('password') === value) {
+                return Promise.resolve();
+              }
+              return Promise.reject(new Error('The new password that you entered do not match!'));
+            },
+          }),
+        ]}
       >
         <Input.Password placeholder="Re-enter password" style={{ borderRadius: '50px' }} size="large" prefix={<KeyOutlined className='text-primaryBlueDark' style={{ marginLeft: '5px', marginRight: '5px' }} />} />
       </Form.Item>

@@ -6,6 +6,8 @@ import { KeyOutlined, UserOutlined } from '@ant-design/icons';
 import { login } from '@/app/api/auth/auth';
 import { useAppDispatch } from '@/lib/hooks';
 import { updateUsername } from '@/lib/features/userSlice';
+import { useRouter } from 'next/navigation'
+import { updateNotification } from '@/lib/features/notification';
 
 type FieldType = {
   username?: string;
@@ -14,12 +16,25 @@ type FieldType = {
 };
 
 const FormLogin: React.FC = () => {
+  const router = useRouter()
   const dispatch = useAppDispatch();
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     if (values.username && values.password) {
       const fetchLogin = await login({ username: values.username, password: values.password })
-      dispatch(updateUsername(fetchLogin?.username))
+      if (fetchLogin.data?.username) {
+        dispatch(updateUsername(fetchLogin?.username))
+        router.push('/')
+        dispatch(updateNotification({
+          type: 'success',
+          description: 'Logged in successfully'
+        }))
+      } else {
+        dispatch(updateNotification({
+          type: 'fail',
+          description: fetchLogin.data
+        }))
+      }
     }
   };
   return (

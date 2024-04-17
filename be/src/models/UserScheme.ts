@@ -15,6 +15,9 @@ export class User extends Document {
   email: string;
 
   @Prop()
+  github: string;
+
+  @Prop()
   refreshToken: string;
 
   @Prop()

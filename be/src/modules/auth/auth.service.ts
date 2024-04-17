@@ -13,6 +13,10 @@ export class AuthService {
   async register(user: User): Promise<any> {
     try {
       const users = await this.userService.create(user);
+
+      if (typeof users === 'string') {
+        return users;
+      }
       const token = await this._createToken(users);
       return { username: users.username, ...token };
     } catch (error) {
@@ -23,11 +27,15 @@ export class AuthService {
 
   async login(user: User): Promise<any> {
     try {
-      const findUser = await this.userService.findLogin(user);
+      const users = await this.userService.findLogin(user);
 
-      const token = await this._createToken(findUser);
+      if (typeof users === 'string') {
+        return users;
+      }
 
-      return { username: findUser.username, ...token };
+      const token = await this._createToken(users);
+
+      return { username: users.username, ...token };
     } catch (error) {
       console.log(error);
       throw new HttpException('Error', HttpStatus.UNAUTHORIZED);

@@ -19,7 +19,7 @@ export class UserService {
       throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
     }
   }
-  async create(user: User): Promise<User> {
+  async create(user: User): Promise<User | string> {
     try {
       user.password = await bcrypt.hash(user.password, 10);
 
@@ -27,38 +27,50 @@ export class UserService {
         username: user.username,
       });
 
+      const emailInDb = await this.userModel.find({
+        email: user.email,
+      });
+
+      if (userInDb.length > 0 && emailInDb.length > 0) {
+        return 'User and email already exists';
+      }
+
       if (userInDb.length > 0) {
-        throw new HttpException('User already exists', HttpStatus.UNAUTHORIZED);
+        return 'User already exists';
+      }
+
+      if (emailInDb.length > 0) {
+        return 'Email already exists';
       }
 
       const newUser = await this.userModel.create(user);
       return newUser;
     } catch (error) {
       console.log(error);
-      throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Error create account', HttpStatus.UNAUTHORIZED);
     }
   }
 
-  async findLogin(user: User): Promise<User> {
+  async findLogin(user: User): Promise<User | string> {
     try {
-      const findUser = await this.userModel.find({
+      const userInDb = await this.userModel.find({
         username: user.username,
       });
 
-      if (!findUser) {
-        throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
+      if (!userInDb.length) {
+        return 'User not found';
       }
 
-      const is_equal = bcrypt.compareSync(user.password, findUser[0].password);
+      const is_equal = bcrypt.compareSync(user.password, userInDb[0].password);
 
       if (!is_equal) {
-        throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+        return 'Invalid credentials';
       }
 
-      return findUser[0];
+      return userInDb[0];
     } catch (error) {
       console.log(error);
-      throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Error Login', HttpStatus.UNAUTHORIZED);
     }
   }
 

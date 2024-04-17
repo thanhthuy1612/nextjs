@@ -1,31 +1,28 @@
-import { post, get } from '../base';
+import { post } from '../base';
 import { url } from '../url';
-import { getSession } from 'next-auth/react';
 
 const path = url.auth;
 export interface ILogin {
   username: string;
   password: string;
+  email?: string;
 }
-
-export const session = async (req: any, res: any) => {
-  const session = await getSession({ req });
-
-  if (!session) {
-    res.status(401).json({ error: 'Unauthenticated user' });
-    return;
-  }
-
-  res.json({
-    user: session.user,
-  });
-};
 
 export const login = async (user: ILogin) => {
   try {
     const res = await post(`${path}/login`, { ...user });
     localStorage.setItem('token', res.data.data.accessToken);
-    return { ...res.data.data };
+    return { ...res.data };
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const register = async (user: ILogin) => {
+  try {
+    const res = await post(`${path}/register`, { ...user });
+    localStorage.setItem('token', res.data.data.accessToken);
+    return { ...res.data };
   } catch (err) {
     console.log(err);
   }

@@ -14,7 +14,7 @@ export class AuthController {
     @Body()
     user: User,
   ): Promise<ResponseData<any>> {
-    return new ResponseData<User>(
+    return new ResponseData<User | string>(
       await this.authService.register(user),
       HttpStatus.SUCCESS,
       HttpMessage.SUCCESS,
@@ -26,7 +26,7 @@ export class AuthController {
     @Body()
     user: User,
   ): Promise<ResponseData<any>> {
-    return new ResponseData<User>(
+    return new ResponseData<User | string>(
       await this.authService.login(user),
       HttpStatus.SUCCESS,
       HttpMessage.SUCCESS,

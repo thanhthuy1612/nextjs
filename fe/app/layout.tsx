@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ConfigProvider } from "antd";
 import "./globals.css";
 import StoreProvider from "./StoreProvider";
+import Notification from './components/Notification';
 
 export const metadata: Metadata = {
   title: "Project",
@@ -33,7 +34,9 @@ export default function RootLayout({
             },
           }}
         >
-          <body className="bg-primaryWhite">{children}</body>
+          <Notification>
+            <body className="bg-primaryWhite">{children}</body>
+          </Notification>
         </ConfigProvider>
       </StoreProvider>
     </html>

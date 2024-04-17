@@ -4,7 +4,7 @@ import React from 'react';
 import type { MenuProps } from 'antd';
 import { UnlockOutlined, UserAddOutlined } from '@ant-design/icons';
 import dynamic from 'next/dynamic';
-import Loading from './loading';
+import Loading from '../components/Loading';
 
 const FormLogin = dynamic(() => import('./components/FormLogin'), {
   loading: () => <Loading />,
