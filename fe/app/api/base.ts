@@ -2,9 +2,11 @@ import axios from 'axios';
 import { baseURL } from './url';
 
 const request = axios.create({ baseURL: baseURL, withCredentials: true });
+const requestConnect= axios.create({ baseURL: baseURL, withCredentials: true });
 
 request.interceptors.request.use(
   function (config) {
+    // Perform localStorage action
     const accessToken = localStorage.getItem('token');
     if (accessToken) {
       config.headers['x-access-token'] = accessToken;
@@ -34,6 +36,11 @@ export const update = async (path: string, options = {}) => {
 
 export const post = async (path: string, options = {}) => {
   const response = await request.post(path, options);
+  return response;
+};
+
+export const postConnect = async (path: string, options = {}) => {
+  const response = await requestConnect.post(path, options);
   return response;
 };
 

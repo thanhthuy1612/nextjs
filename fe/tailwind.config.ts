@@ -27,7 +27,8 @@ const config: Config = {
         redPastel: '#FF6961',
         pinkPastel: '#D49E8D',
         greenPastel:'#A0CF9D',
-        yellowPastel:'#FED797'
+        yellowPastel:'#FED797',
+        blueDark: '#001C44'
       },
       boxShadow: {
         'focus-visible': 'none',

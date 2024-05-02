@@ -47,7 +47,8 @@ export default function Notification({
           message: notificationInfo?.message ?? onRenderMessage(),
           description: notificationInfo?.description,
           placement: notificationInfo?.placement,
-          icon: onRenderIcon()
+          icon: onRenderIcon(),
+          style: { backgroundColor: '#FBF9F1', borderRadius: '15px' }
         });
         dispatch(resetStateNotification())
       };
@@ -55,7 +56,7 @@ export default function Notification({
     }
   }, [notificationInfo])
 
-  const contextValue = React.useMemo(() => ({ name: 'Ant Design' }), []);
+  const contextValue = React.useMemo(() => ({ name: 'notification' }), []);
   return <Context.Provider value={contextValue}>
     {contextHolder}
     {children}

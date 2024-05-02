@@ -25,7 +25,10 @@ async function bootstrap() {
   }
 
   app.enableCors({
-    origin: ['http://localhost:3000'],
+    origin: [
+      'http://localhost:3000',
+      'https://accounts.google.com/o/oauth2/v2/auth',
+    ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'HEAD', 'DELETE'],
     // preflightContinue: false,
     // optionsSuccessStatus: 204,

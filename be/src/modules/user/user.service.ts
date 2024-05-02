@@ -19,6 +19,23 @@ export class UserService {
       throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
     }
   }
+
+  async connectEmail(email: string): Promise<User | string> {
+    try {
+      const emailInDb = await this.userModel.find({ email });
+
+      if (emailInDb.length > 0) {
+        return emailInDb[0];
+      }
+
+      // const newUser = await this.userModel.create({ username: email, email });
+      // return newUser;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException('Error Connect', HttpStatus.UNAUTHORIZED);
+    }
+  }
+
   async create(user: User): Promise<User | string> {
     try {
       user.password = await bcrypt.hash(user.password, 10);
@@ -53,30 +70,43 @@ export class UserService {
 
   async findLogin(user: User): Promise<User | string> {
     try {
-      const userInDb = await this.userModel.find({
-        username: user.username,
+      const emailInDb = await this.userModel.find({
+        email: user.email,
       });
 
-      if (!userInDb.length) {
-        return 'User not found';
+      if (!emailInDb.length) {
+        return 'Email not found';
       }
 
-      const is_equal = bcrypt.compareSync(user.password, userInDb[0].password);
+      const is_equal = bcrypt.compareSync(user.password, emailInDb[0].password);
 
       if (!is_equal) {
         return 'Invalid credentials';
       }
 
-      return userInDb[0];
+      return emailInDb[0];
     } catch (error) {
       console.log(error);
       throw new HttpException('Error Login', HttpStatus.UNAUTHORIZED);
     }
   }
 
-  async findByUserName(username: string): Promise<User> {
+  async findByEmail(email: string): Promise<User | string> {
     try {
-      const findUser = await this.userModel.find({ username });
+      const findUser = await this.userModel.find({ email });
+      if (!findUser) {
+        return 'User not found';
+      }
+      return findUser[0];
+    } catch (error) {
+      console.log(error);
+      return 'Error';
+    }
+  }
+
+  async checkByEmail(email: string): Promise<User> {
+    try {
+      const findUser = await this.userModel.find({ email });
       if (!findUser) {
         throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
       }
@@ -87,10 +117,10 @@ export class UserService {
     }
   }
 
-  async findAndUpdateByUserName(username: string): Promise<User> {
+  async findAndUpdateByEmail(email: string): Promise<User> {
     try {
       const findUser = await this.userModel.findOneAndUpdate(
-        { username },
+        { email },
         {
           refreshToken: null,
         },

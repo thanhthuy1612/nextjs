@@ -1,12 +1,15 @@
 'use client'
+
 import React from 'react';
-import { Button, Form, type FormProps, Input, NotificationArgsProps } from 'antd';
+import { Button, Form, type FormProps, Input } from 'antd';
 import { KeyOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
-import { useAppDispatch } from '@/lib/hooks';
-import { updateUsername } from '@/lib/features/userSlice';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { updateUser } from '@/lib/features/userSlice';
 import { register } from '@/app/api/auth/auth';
 import { useRouter } from 'next/navigation'
 import { updateNotification } from '@/lib/features/notification';
+import { IStatusCode } from '@/app/api/IStatusCode';
+import { updateIsLoadingForm } from '@/lib/features/login';
 
 type FieldType = {
   username?: string;
@@ -16,14 +19,21 @@ type FieldType = {
 };
 
 const FormRegister: React.FC = () => {
+  const [isDisable, setIsDisable] = React.useState<boolean>(true)
+  const { isLoadingConnect, isLoadingForm } = useAppSelector(state => state.login)
   const router = useRouter()
   const dispatch = useAppDispatch();
 
+  React.useEffect(() => {
+    setIsDisable(isLoadingConnect || isLoadingForm)
+  }, [isLoadingConnect, isLoadingForm])
+
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     if (values.username && values.password && values.email) {
+      dispatch(updateIsLoadingForm(true))
       const fetchRegister = await register({ username: values.username, password: values.password, email: values.email })
-      if (fetchRegister.data?.username) {
-        dispatch(updateUsername(fetchRegister?.username))
+      if (fetchRegister.statusCode === IStatusCode.SUCCESS) {
+        dispatch(updateUser({ username: fetchRegister.data?.username, email: fetchRegister.data?.email }))
         router.push('/')
         dispatch(updateNotification({
           type: 'success',
@@ -35,6 +45,7 @@ const FormRegister: React.FC = () => {
           description: fetchRegister.data
         }))
       }
+      dispatch(updateIsLoadingForm(false))
     }
   };
 
@@ -50,7 +61,7 @@ const FormRegister: React.FC = () => {
         name="username"
         rules={[{ required: true, message: 'Please input your username!' }]}
       >
-        <Input placeholder="Username" style={{ borderRadius: '50px' }} size="large" prefix={<UserOutlined className='text-primaryBlueDark' style={{ marginLeft: '5px', marginRight: '5px' }} />} />
+        <Input disabled={isDisable} placeholder="Username" style={{ borderRadius: '50px' }} size="large" prefix={<UserOutlined className='text-primaryBlueDark' style={{ marginLeft: '5px', marginRight: '5px' }} />} />
       </Form.Item>
 
       <Form.Item<FieldType>
@@ -63,14 +74,14 @@ const FormRegister: React.FC = () => {
           { required: true, message: 'Please input your email!' }
         ]}
       >
-        <Input placeholder="Email" style={{ borderRadius: '50px' }} size="large" prefix={<MailOutlined className='text-primaryBlueDark' style={{ marginLeft: '5px', marginRight: '5px' }} />} />
+        <Input disabled={isDisable} placeholder="Email" style={{ borderRadius: '50px' }} size="large" prefix={<MailOutlined className='text-primaryBlueDark' style={{ marginLeft: '5px', marginRight: '5px' }} />} />
       </Form.Item>
 
       <Form.Item<FieldType>
         name="password"
         rules={[{ required: true, message: 'Please input your password!' }]}
       >
-        <Input.Password placeholder="Password" style={{ borderRadius: '50px' }} size="large" prefix={<KeyOutlined className='text-primaryBlueDark' style={{ marginLeft: '5px', marginRight: '5px' }} />} />
+        <Input.Password disabled={isDisable} placeholder="Password" style={{ borderRadius: '50px' }} size="large" prefix={<KeyOutlined className='text-primaryBlueDark' style={{ marginLeft: '5px', marginRight: '5px' }} />} />
       </Form.Item>
 
       <Form.Item<FieldType>
@@ -89,11 +100,11 @@ const FormRegister: React.FC = () => {
           }),
         ]}
       >
-        <Input.Password placeholder="Re-enter password" style={{ borderRadius: '50px' }} size="large" prefix={<KeyOutlined className='text-primaryBlueDark' style={{ marginLeft: '5px', marginRight: '5px' }} />} />
+        <Input.Password disabled={isDisable} placeholder="Re-enter password" style={{ borderRadius: '50px' }} size="large" prefix={<KeyOutlined className='text-primaryBlueDark' style={{ marginLeft: '5px', marginRight: '5px' }} />} />
       </Form.Item>
 
       <Form.Item style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
-        <Button type="primary" size='large' style={{ borderRadius: '50px', paddingLeft: '50px', paddingRight: '50px' }} htmlType="submit">
+        <Button loading={isLoadingForm} disabled={isLoadingConnect} type="primary" size='large' style={{ borderRadius: '50px', paddingLeft: '50px', paddingRight: '50px' }} htmlType="submit">
           Create Account
         </Button>
       </Form.Item>

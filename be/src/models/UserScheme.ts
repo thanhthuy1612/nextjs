@@ -5,17 +5,17 @@ import { Document } from 'mongoose';
   timestamps: true,
 })
 export class User extends Document {
-  @Prop({ required: true })
+  @Prop()
   username: string;
 
-  @Prop()
+  @Prop({ required: true })
   password: string;
 
   @Prop()
   email: string;
 
-  @Prop()
-  github: string;
+  @Prop({ type: Date })
+  timeJoin: Date;
 
   @Prop()
   refreshToken: string;

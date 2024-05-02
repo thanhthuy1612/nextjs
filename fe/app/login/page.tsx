@@ -2,9 +2,11 @@
 
 import React from 'react';
 import type { MenuProps } from 'antd';
-import { UnlockOutlined, UserAddOutlined } from '@ant-design/icons';
+import { LoginOutlined, UserAddOutlined } from '@ant-design/icons';
 import dynamic from 'next/dynamic';
 import Loading from '../components/Loading';
+import { useAppDispatch } from '@/lib/hooks';
+import { resetStateLogin } from '@/lib/features/login';
 
 const FormLogin = dynamic(() => import('./components/FormLogin'), {
   loading: () => <Loading />,
@@ -40,11 +42,16 @@ export enum AuthMenu {
 export default function Login() {
   const [auth, setAuth] = React.useState<AuthMenu>(AuthMenu.LOGIN);
 
+  const dispatch = useAppDispatch()
+  React.useEffect(() => {
+    dispatch(resetStateLogin())
+  }, [])
+
   const items: MenuProps['items'] = [
     {
       label: 'Login',
       key: AuthMenu.LOGIN,
-      icon: <UnlockOutlined />,
+      icon: <LoginOutlined />,
       style: {
         flexBasis: '50%',
         borderTopLeftRadius: '0.75rem',
@@ -79,7 +86,7 @@ export default function Login() {
       <div className="min-w-[600px] justify-center bg-primaryGrayLight rounded-xl shadow-2xl">
         <Menu onClick={onClickMenu} style={{ display: 'flex', backgroundColor: 'transparent', borderTopLeftRadius: '0.75rem', borderTopRightRadius: '0.75rem' }} selectedKeys={[auth.toString()]} mode="horizontal" items={items} />
         <div className='flex flex-col my-[50px] mx-[100px] items-center justify-center text-primaryBlueDark'>
-          <HeaderLogin title={auth === AuthMenu.LOGIN ? 'Login' : 'Register'} Component={auth === AuthMenu.LOGIN ? UnlockOutlined : UserAddOutlined} />
+          <HeaderLogin title={auth === AuthMenu.LOGIN ? 'Login' : 'Register'} Component={auth === AuthMenu.LOGIN ? LoginOutlined : UserAddOutlined} />
           {renderBody()}
           <FooterLogin />
         </div>

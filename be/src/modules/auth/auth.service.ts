@@ -18,7 +18,7 @@ export class AuthService {
         return users;
       }
       const token = await this._createToken(users);
-      return { username: users.username, ...token };
+      return { username: users.username, email: users.email, ...token };
     } catch (error) {
       console.log(error);
       throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
@@ -35,7 +35,24 @@ export class AuthService {
 
       const token = await this._createToken(users);
 
-      return { username: users.username, ...token };
+      return { username: users.username, email: users.email, ...token };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
+    }
+  }
+
+  async connect(email: string): Promise<any> {
+    try {
+      const users = await this.userService.connectEmail(email);
+
+      if (typeof users === 'string') {
+        return users;
+      }
+
+      const token = await this._createToken(users);
+
+      return { username: users.username, email, ...token };
     } catch (error) {
       console.log(error);
       throw new HttpException('Error', HttpStatus.UNAUTHORIZED);
@@ -49,21 +66,21 @@ export class AuthService {
   ) {
     const accessToken = await this.jwtService.signAsync(
       {
-        username: user.username,
+        email: user.email,
         isSecondFactorAuthenticated,
       },
       {
         secret: process.env.SECRETKEY,
-        expiresIn: process.env.EXPIRESIN,
+        expiresIn: `${process.env.EXPIRESIN}s`,
       },
     );
 
     if (refresh) {
       const refreshToken = await this.jwtService.signAsync(
-        { username: user.username },
+        { email: user.email },
         {
           secret: process.env.SECRETKEY_REFRESH,
-          expiresIn: process.env.EXPIRESIN_REFRESH,
+          expiresIn: `${process.env.EXPIRESIN_REFRESH}s`,
         },
       );
       await this.userService.update(user._id, { refreshToken });
@@ -80,8 +97,8 @@ export class AuthService {
     }
   }
 
-  async validateUser(username: string): Promise<User> {
-    return await this.userService.findByUserName(username);
+  async validateEmail(email: string): Promise<User> {
+    return await this.userService.checkByEmail(email);
   }
 
   async getAccess2FA(user: User) {
@@ -93,14 +110,14 @@ export class AuthService {
       const payload = await this.jwtService.verifyAsync(refresh_token, {
         secret: process.env.SECRETKEY_REFRESH,
       });
-      const user = await this.userService.findByUserName(payload.username);
+      const user = await this.userService.checkByEmail(payload.email);
 
       if (user.refreshToken !== refresh_token) {
         throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
       }
 
       const token = await this._createToken(user, true, false);
-      return { username: user.username, token };
+      return { email: user.email, token };
     } catch (error) {
       console.log(error);
       throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
@@ -109,7 +126,7 @@ export class AuthService {
 
   async logout(user: User): Promise<User> {
     try {
-      return await this.userService.findAndUpdateByUserName(user.username);
+      return await this.userService.findAndUpdateByEmail(user.email);
     } catch (error) {
       console.log(error);
       throw new HttpException('Error', HttpStatus.UNAUTHORIZED);

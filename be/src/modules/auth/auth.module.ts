@@ -7,8 +7,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
 import { UserService } from '../user/user.service';
 import { JwtStrategy } from './passport/jwt.strategy';
-import { GoogleStrategy } from './passport/google.strategy';
+// import { GoogleStrategy } from './passport/google.strategy';
+import { configDotenv } from 'dotenv';
 
+configDotenv();
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
@@ -23,8 +25,8 @@ import { GoogleStrategy } from './passport/google.strategy';
       signOptions: { expiresIn: `${process.env.EXPIRESIN}s` },
     }),
   ],
-  providers: [AuthService, UserService, JwtStrategy, GoogleStrategy],
+  providers: [AuthService, UserService, JwtStrategy],
   controllers: [AuthController],
-  exports: [AuthService, UserService],
+  exports: [AuthService, UserService, JwtStrategy],
 })
 export class AuthModule {}

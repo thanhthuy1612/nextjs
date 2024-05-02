@@ -17,7 +17,7 @@ export class JwtTwoFactorStrategy extends PassportStrategy(
   }
 
   async validate({ email, isSecondFactorAuthenticated }) {
-    const user = await this.authService.validateUser(email);
+    const user = await this.authService.validateEmail(email);
 
     if (!user) {
       throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
