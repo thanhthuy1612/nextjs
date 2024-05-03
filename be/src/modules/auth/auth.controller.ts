@@ -6,6 +6,7 @@ import { AuthGuardCustom } from './auth.guard';
 import { HttpMessage, HttpStatus } from 'src/global/globalEnum';
 import { AuthGuard } from '@nestjs/passport';
 import { getResponseData } from 'src/global/ultis';
+import { LoginDto } from './auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -23,7 +24,7 @@ export class AuthController {
   @Post('login')
   async loginUser(
     @Body()
-    user: User,
+    user: LoginDto,
   ): Promise<ResponseData<any>> {
     const result = await this.authService.login(user);
     return getResponseData(result);

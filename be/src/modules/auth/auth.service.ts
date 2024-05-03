@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/models/UserScheme';
 import { UserService } from '../user/user.service';
+import { LoginDto } from './auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +26,7 @@ export class AuthService {
     }
   }
 
-  async login(user: User): Promise<any> {
+  async login(user: LoginDto): Promise<any> {
     try {
       const users = await this.userService.findLogin(user);
 
@@ -33,7 +34,7 @@ export class AuthService {
         return users;
       }
 
-      const token = await this._createToken(users);
+      const token = await this._createToken(users, false, user.isRemember);
 
       return { username: users.username, email: users.email, ...token };
     } catch (error) {
@@ -71,7 +72,7 @@ export class AuthService {
       },
       {
         secret: process.env.SECRETKEY,
-        expiresIn: `${process.env.EXPIRESIN}s`,
+        expiresIn: `${process.env.EXPIRESIN}h`,
       },
     );
 
@@ -85,13 +86,11 @@ export class AuthService {
       );
       await this.userService.update(user._id, { refreshToken });
       return {
-        expiresIn: process.env.EXPIRESIN,
         accessToken,
         refreshToken,
       };
     } else {
       return {
-        expiresIn: process.env.EXPIRESIN,
         accessToken,
       };
     }

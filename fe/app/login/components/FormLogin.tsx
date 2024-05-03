@@ -30,9 +30,8 @@ const FormLogin: React.FC = () => {
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     if (values.email && values.password) {
       dispatch(updateIsLoadingForm(true))
-      const fetchLogin = await login({ email: values.email, password: values.password })
+      const fetchLogin = await login({ email: values.email, password: values.password, isRemember: values.remember })
       if (fetchLogin.statusCode === IStatusCode.SUCCESS) {
-        dispatch(updateUser({ username: fetchLogin.data?.username, email: fetchLogin.data?.email }))
         router.push('/')
         dispatch(updateNotification({
           type: 'success',

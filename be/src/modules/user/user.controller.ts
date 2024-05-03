@@ -6,6 +6,7 @@ import {
   Param,
   Body,
   UseGuards,
+  Post,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ResponseData } from 'src/global/globalClass';
@@ -40,11 +41,11 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get('email')
+  @Post('email')
   async getUserByEmail(
     @Body()
     user: User,
-  ): Promise<ResponseData<User>> {
+  ): Promise<ResponseData<any>> {
     const result = await this.userService.findByEmail(user.email);
     return getResponseData(result);
   }

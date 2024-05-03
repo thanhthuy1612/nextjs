@@ -1,20 +1,33 @@
 'use client'
 
 import React from 'react';
-import { Avatar, Button, Dropdown } from 'antd';
+import { Avatar, Button, Dropdown, MenuProps } from 'antd';
 import { useRouter } from 'next/navigation';
 import { BellOutlined, HomeOutlined, LoginOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
-import { useAppSelector } from '@/lib/hooks';
+import { signOut } from 'next-auth/react';
 
-const ButtonLogo: React.FC = async () => {
-  const { username } = useAppSelector(state => state.user)
+const ButtonLogo: React.FC = () => {
   const [isDisable, setIsDisable] = React.useState<boolean>(false)
   const router = useRouter()
+  const user = JSON.parse((localStorage.getItem('user') ?? '{}').toString());
+
+  const onClickLogout = () => {
+    localStorage.clear();
+    signOut()
+  }
+
+  const handleMenuClick: MenuProps['onClick'] = (e) => {
+    switch (e.key) {
+      case '4':
+        onClickLogout();
+        break;
+    }
+  };
 
   const items = [
     {
       key: '1',
-      label: username,
+      label: user.username,
       icon: <HomeOutlined />
     },
     {
@@ -41,7 +54,7 @@ const ButtonLogo: React.FC = async () => {
 
   return (
     <div className='flex items-center'>
-      {!username ?
+      {!user.username ?
         <Button
           icon={<LoginOutlined />}
           disabled={isDisable}
@@ -50,7 +63,7 @@ const ButtonLogo: React.FC = async () => {
         >
           Login
         </Button> :
-        <Dropdown menu={{ items, style: { minWidth: '200px', backgroundColor: '#FBF9F1' } }} arrow>
+        <Dropdown menu={{ items, onClick: handleMenuClick, style: { minWidth: '200px', backgroundColor: '#FBF9F1' } }} arrow>
           <Avatar
             className=' bg-primaryWhite text-primaryBlueDark m-[10px] ring-primaryBlue ring-offset-2 ring'
             icon={<UserOutlined />} />

@@ -33,6 +33,7 @@ export const authConfig: NextAuthOptions = {
     async signIn({ user, account, profile, email, credentials }) {
       if (user?.email?.toString()) {
         const res = await connect({ email: user?.email?.toString() });
+        console.log(res);
         if (res.statusCode === IStatusCode.SUCCESS) {
           return Promise.resolve(true);
         }

@@ -8,10 +8,10 @@ export class User extends Document {
   @Prop()
   username: string;
 
-  @Prop({ required: true })
+  @Prop()
   password: string;
 
-  @Prop()
+  @Prop({ required: true })
   email: string;
 
   @Prop({ type: Date })

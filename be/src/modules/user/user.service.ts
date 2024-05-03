@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/models/UserScheme';
 import mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import { LoginDto } from '../auth/auth.dto';
 
 @Injectable()
 export class UserService {
@@ -68,7 +69,7 @@ export class UserService {
     }
   }
 
-  async findLogin(user: User): Promise<User | string> {
+  async findLogin(user: LoginDto): Promise<User | string> {
     try {
       const emailInDb = await this.userModel.find({
         email: user.email,

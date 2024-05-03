@@ -7,7 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
 import { UserService } from '../user/user.service';
 import { JwtStrategy } from './passport/jwt.strategy';
-// import { GoogleStrategy } from './passport/google.strategy';
+import { GoogleStrategy } from './passport/google.strategy';
 import { configDotenv } from 'dotenv';
 
 configDotenv();
@@ -22,10 +22,10 @@ configDotenv();
     JwtModule.register({
       global: true,
       secret: process.env.SECRETKEY,
-      signOptions: { expiresIn: `${process.env.EXPIRESIN}s` },
+      signOptions: { expiresIn: `${process.env.EXPIRESIN}h` },
     }),
   ],
-  providers: [AuthService, UserService, JwtStrategy],
+  providers: [AuthService, UserService, JwtStrategy, GoogleStrategy],
   controllers: [AuthController],
   exports: [AuthService, UserService, JwtStrategy],
 })
